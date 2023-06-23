@@ -8,14 +8,21 @@ import NumberCard from './number-card';
 import style from '../style';
 
 function FlipNumber({
-  number, unit, size, perspective, numberWrapperStyle, cardStyle, flipCardStyle, numberStyle,
+  number,
+  unit,
+  flippable,
+  size,
+  perspective,
+  numberWrapperStyle,
+  cardStyle,
+  flipCardStyle,
+  numberStyle,
 }) {
-  number = parseInt(number);
-  let previousNumber = number - 1;
+  let previousNumber = number - (flippable ? 1 : 0);
   if (unit !== 'hours') {
     previousNumber = previousNumber === -1 ? 59 : previousNumber;
   } else {
-    previousNumber = previousNumber === -1 ? 23 : previousNumber;
+    previousNumber = previousNumber === -1 ? 0 : previousNumber;
   }
   number = number < 10 ? `0${number}` : number;
   previousNumber = previousNumber < 10 ? `0${previousNumber}` : previousNumber;
@@ -53,10 +60,8 @@ FlipNumber.defaultProps = {
 };
 
 FlipNumber.propTypes = {
-  number: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-  ]).isRequired,
+  number: PropTypes.number.isRequired,
+  flippable: PropTypes.bool,
   unit: PropTypes.oneOf(['hours', 'minutes', 'seconds']),
   size: PropTypes.number,
   perspective: PropTypes.number,
