@@ -14,7 +14,7 @@ class CountdownTimer extends React.Component {
     hours: 0,
     minutes: 0,
     seconds: 0,
-  }
+  };
 
   componentDidMount() {
     const { time } = this.props;
@@ -24,20 +24,14 @@ class CountdownTimer extends React.Component {
       minutes,
       seconds,
     });
-    this.timer = setInterval(
-      () => this.updateTime(),
-      1000,
-    );
+    this.timer = setInterval(() => this.updateTime(), 1000);
   }
 
   shouldComponentUpdate(nextProps) {
     const { play } = this.props;
     if (nextProps.play !== play) {
       if (nextProps.play) {
-        this.timer = setInterval(
-          () => this.updateTime(),
-          1000,
-        );
+        this.timer = setInterval(() => this.updateTime(), 1000);
       } else {
         clearInterval(this.timer);
       }
@@ -51,20 +45,36 @@ class CountdownTimer extends React.Component {
 
   updateTime = () => {
     const { hours, minutes, seconds } = this.state;
+    const { onFinish } = this.props;
     const newState = TransformUtils.subtractTime(hours, minutes, seconds);
     this.setState(prevState => ({ ...prevState, ...newState }));
-  }
+
+    if (
+      newState.hours === 0
+      && newState.minutes === 0
+      && newState.seconds === 0
+      && onFinish
+    ) {
+      onFinish();
+    }
+  };
 
   render() {
     const { wrapperStyle, flipNumberProps } = this.props;
     const { hours, minutes, seconds } = this.state;
     return (
       <View style={[style.wrapper, wrapperStyle]}>
-        {!!hours && <FlipNumber number={hours} unit="hours" {...flipNumberProps} />}
+        {!!hours && (
+          <FlipNumber number={hours} unit="hours" {...flipNumberProps} />
+        )}
         <Separator />
-        {!!minutes && <FlipNumber number={minutes} unit="minutes" {...flipNumberProps} />}
+        {!!minutes && (
+          <FlipNumber number={minutes} unit="minutes" {...flipNumberProps} />
+        )}
         <Separator />
-        {!!seconds && <FlipNumber number={seconds} unit="seconds" {...flipNumberProps} />}
+        {!!seconds && (
+          <FlipNumber number={seconds} unit="seconds" {...flipNumberProps} />
+        )}
       </View>
     );
   }
@@ -76,10 +86,7 @@ CountdownTimer.defaultProps = {
 };
 
 CountdownTimer.propTypes = {
-  time: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-  ]).isRequired,
+  time: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   play: PropTypes.bool,
   wrapperStyle: PropTypes.object,
   flipNumberProps: PropTypes.shape({
@@ -90,6 +97,7 @@ CountdownTimer.propTypes = {
     flipCardStyle: PropTypes.object,
     numberStyle: PropTypes.object,
   }),
+  onFinish: PropTypes.func,
 };
 
 export default CountdownTimer;
