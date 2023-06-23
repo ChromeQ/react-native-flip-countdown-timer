@@ -53,26 +53,32 @@ class CountdownTimer extends React.Component {
       newState.hours === 0
       && newState.minutes === 0
       && newState.seconds === 0
-      && onFinish
     ) {
+      clearInterval(this.timer);
       onFinish();
     }
   };
 
   render() {
-    const { wrapperStyle, flipNumberProps } = this.props;
+    const {
+      wrapperStyle, flipNumberProps, unitsToShow, separators,
+    } = this.props;
     const { hours, minutes, seconds } = this.state;
+    const showHours = !!hours && unitsToShow.includes('H');
+    const showMinutes = !!minutes && unitsToShow.includes('M');
+    const showSeconds = !!seconds && unitsToShow.includes('S');
+
     return (
       <View style={[style.wrapper, wrapperStyle]}>
-        {!!hours && (
+        {showHours && (
           <FlipNumber number={hours} unit="hours" {...flipNumberProps} />
         )}
-        <Separator />
-        {!!minutes && (
+        {separators && <Separator />}
+        {showMinutes && (
           <FlipNumber number={minutes} unit="minutes" {...flipNumberProps} />
         )}
-        <Separator />
-        {!!seconds && (
+        {separators && <Separator />}
+        {showSeconds && (
           <FlipNumber number={seconds} unit="seconds" {...flipNumberProps} />
         )}
       </View>
@@ -83,10 +89,13 @@ class CountdownTimer extends React.Component {
 CountdownTimer.defaultProps = {
   play: true,
   wrapperStyle: {},
+  onFinish: () => {},
+  separators: true,
+  unitsToShow: ['H', 'M', 'S'],
 };
 
 CountdownTimer.propTypes = {
-  time: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  time: PropTypes.number.isRequired,
   play: PropTypes.bool,
   wrapperStyle: PropTypes.object,
   flipNumberProps: PropTypes.shape({
@@ -98,6 +107,8 @@ CountdownTimer.propTypes = {
     numberStyle: PropTypes.object,
   }),
   onFinish: PropTypes.func,
+  separators: PropTypes.bool,
+  unitsToShow: PropTypes.arrayOf(PropTypes.string),
 };
 
 export default CountdownTimer;
