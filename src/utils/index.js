@@ -59,19 +59,15 @@ function formatTime(hours, minutes, seconds) {
   return { hours, minutes, seconds };
 }
 
-function formatNumberToTime(number) {
+function convertNumberToTime(number) {
   const secNum = parseInt(number);
   const hours = Math.floor(secNum / 3600);
   const minutes = Math.floor((secNum - hours * 3600) / 60);
   const seconds = secNum - hours * 3600 - minutes * 60;
-  return formatTime(hours, minutes, seconds);
+  return { hours, minutes, seconds };
 }
 
 function subtractTime(hours, minutes, seconds) {
-  hours = parseInt(hours);
-  minutes = parseInt(minutes);
-  seconds = parseInt(seconds);
-
   seconds -= 1;
 
   if (seconds < 0) {
@@ -94,7 +90,7 @@ function subtractTime(hours, minutes, seconds) {
     }
   }
 
-  return formatTime(hours, minutes, seconds);
+  return { hours, minutes, seconds };
 }
 
 export default {
@@ -104,6 +100,7 @@ export default {
   perspectiveMatrix,
   translateMatrix,
   untranslateMatrix,
-  formatNumberToTime,
+  convertNumberToTime,
   subtractTime,
+  formatTime,
 };

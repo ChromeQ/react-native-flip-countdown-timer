@@ -18,7 +18,7 @@ class CountdownTimer extends React.Component {
 
   componentDidMount() {
     const { time } = this.props;
-    const { hours, minutes, seconds } = TransformUtils.formatNumberToTime(time);
+    const { hours, minutes, seconds } = TransformUtils.convertNumberToTime(time);
     this.setState({
       hours,
       minutes,
@@ -64,9 +64,10 @@ class CountdownTimer extends React.Component {
       wrapperStyle, flipNumberProps, unitsToShow, separators,
     } = this.props;
     const { hours, minutes, seconds } = this.state;
-    const showHours = !!hours && unitsToShow.includes('H');
-    const showMinutes = !!minutes && unitsToShow.includes('M');
-    const showSeconds = !!seconds && unitsToShow.includes('S');
+    console.log('render foo', hours, minutes, seconds);
+    const showHours = unitsToShow.includes('H');
+    const showMinutes = unitsToShow.includes('M');
+    const showSeconds = unitsToShow.includes('S');
 
     return (
       <View style={[style.wrapper, wrapperStyle]}>
@@ -78,7 +79,9 @@ class CountdownTimer extends React.Component {
             {...flipNumberProps}
           />
         )}
+
         {separators && <Separator />}
+
         {showMinutes && (
           <FlipNumber
             number={minutes}
@@ -87,7 +90,9 @@ class CountdownTimer extends React.Component {
             {...flipNumberProps}
           />
         )}
+
         {separators && <Separator />}
+
         {showSeconds && (
           <FlipNumber
             number={seconds}
