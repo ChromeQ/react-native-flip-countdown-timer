@@ -13,8 +13,10 @@ class CountdownTimer extends React.Component {
   constructor(props) {
     super(props);
 
-    const { duration } = this.props;
-    const { hours, minutes, seconds } = TransformUtils.convertNumberToTime(duration);
+    const { duration, time } = this.props;
+    const { hours, minutes, seconds } = time
+      ? TransformUtils.convertDateToTime(time)
+      : TransformUtils.convertNumberToTime(duration);
 
     this.state = {
       hours,
@@ -40,6 +42,23 @@ class CountdownTimer extends React.Component {
     return true;
   }
 
+  componentDidUpdate(prevProps) {
+    const { time, duration } = this.props;
+
+    if (time !== prevProps.time || duration !== prevProps.duration) {
+      clearInterval(this.timer);
+
+      const newState = time !== prevProps.time
+        ? TransformUtils.convertDateToTime(time)
+        : TransformUtils.convertNumberToTime(duration);
+
+      this.initialTime = true;
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState(newState);
+      this.timer = setInterval(this.updateTime, 1000);
+    }
+  }
+
   componentWillUnmount() {
     clearInterval(this.timer);
   }
@@ -47,18 +66,23 @@ class CountdownTimer extends React.Component {
   updateTime = () => {
     this.initialTime = false;
     const { hours, minutes, seconds } = this.state;
-    const { onComplete } = this.props;
-    const newState = TransformUtils.subtractTime(hours, minutes, seconds);
-    this.setState(prevState => ({ ...prevState, ...newState }));
 
-    if (
-      newState.hours === 0
-      && newState.minutes === 0
-      && newState.seconds === 0
-    ) {
+    if (hours || minutes || seconds) {
+      const { onComplete } = this.props;
+      const newState = TransformUtils.subtractTime(hours, minutes, seconds);
+
+      this.setState(prevState => ({ ...prevState, ...newState }));
+
+      if (
+        newState.hours === 0
+        && newState.minutes === 0
+        && newState.seconds === 0
+      ) {
+        clearInterval(this.timer);
+        setTimeout(onComplete, 800); // Delay the `onComplete` callback the animation duration
+      }
+    } else if (!hours && !minutes && !seconds) {
       clearInterval(this.timer);
-      // Delay the `onComplete` callback the animation duration
-      setTimeout(onComplete, 800);
     }
   };
 
@@ -123,6 +147,7 @@ CountdownTimer.defaultProps = {
 
 CountdownTimer.propTypes = {
   duration: PropTypes.number,
+  time: PropTypes.oneOfType([PropTypes.number, PropTypes.instanceOf(Date)]),
   play: PropTypes.bool,
   wrapperStyle: PropTypes.object,
   flipNumberProps: PropTypes.shape({

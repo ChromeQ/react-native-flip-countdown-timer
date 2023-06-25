@@ -67,6 +67,21 @@ function convertNumberToTime(number) {
   return { hours, minutes, seconds };
 }
 
+// Convert timestamp or Date to internal hours, minutes and seconds
+function convertDateToTime(time) {
+  const now = Date.now();
+  // eslint-disable-next-line no-nested-ternary
+  const target = typeof time === 'number' ? time : time instanceof Date ? time.getTime() : 0;
+
+  const delta = Math.round((target - now) / 1000);
+
+  if (delta <= 0) {
+    return { hours: 0, minutes: 0, seconds: 0 };
+  }
+
+  return convertNumberToTime(delta);
+}
+
 function subtractTime(hours, minutes, seconds) {
   seconds -= 1;
 
@@ -101,6 +116,7 @@ export default {
   translateMatrix,
   untranslateMatrix,
   convertNumberToTime,
+  convertDateToTime,
   subtractTime,
   formatTime,
 };
