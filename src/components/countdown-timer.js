@@ -13,8 +13,8 @@ class CountdownTimer extends React.Component {
   constructor(props) {
     super(props);
 
-    const { time } = this.props;
-    const { hours, minutes, seconds } = TransformUtils.convertNumberToTime(time);
+    const { duration } = this.props;
+    const { hours, minutes, seconds } = TransformUtils.convertNumberToTime(duration);
 
     this.state = {
       hours,
@@ -32,7 +32,7 @@ class CountdownTimer extends React.Component {
     const { play } = this.props;
     if (nextProps.play !== play) {
       if (nextProps.play) {
-        this.timer = setInterval(() => this.updateTime(), 1000);
+        this.timer = setInterval(this.updateTime, 1000);
       } else {
         clearInterval(this.timer);
       }
@@ -122,7 +122,7 @@ CountdownTimer.defaultProps = {
 };
 
 CountdownTimer.propTypes = {
-  time: PropTypes.number.isRequired,
+  duration: PropTypes.number,
   play: PropTypes.bool,
   wrapperStyle: PropTypes.object,
   flipNumberProps: PropTypes.shape({
