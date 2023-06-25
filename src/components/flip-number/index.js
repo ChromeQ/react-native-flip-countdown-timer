@@ -10,30 +10,35 @@ import style from '../style';
 function FlipNumber({
   number,
   unit,
-  flippable,
+  flip,
   size,
   perspective,
   numberWrapperStyle,
   cardStyle,
   flipCardStyle,
   numberStyle,
+  firstRender,
 }) {
-  let previousNumber = number - (flippable ? 1 : 0);
-  if (unit !== 'hours') {
-    previousNumber = previousNumber === -1 ? 59 : previousNumber;
-  } else {
-    previousNumber = previousNumber === -1 ? 0 : previousNumber;
-  }
-  number = number < 10 ? `0${number}` : number;
-  previousNumber = previousNumber < 10 ? `0${previousNumber}` : previousNumber;
+  let previousNumber = number + (flip ? 1 : 0);
 
-  const numberSplit = number.toString().split('');
-  const previousNumberSplit = previousNumber.toString().split('');
+  if (firstRender) {
+    previousNumber = number;
+  } else if (unit !== 'hours') {
+    previousNumber = previousNumber === 60 ? 0 : previousNumber;
+  } else {
+    previousNumber = previousNumber === 24 ? 0 : previousNumber;
+  }
+
+  const numberDisplay = number < 10 ? `0${number}` : String(number);
+  const previousNumberDisplay = previousNumber < 10 ? `0${previousNumber}` : String(previousNumber);
+  const numberSplit = numberDisplay.split('');
+  const previousNumberSplit = previousNumberDisplay.split('');
+
   return (
     <View style={style.wrapper}>
       <NumberCard
-        number={numberSplit[0]}
-        previousNumber={previousNumberSplit[0]}
+        number={previousNumberSplit[0]}
+        previousNumber={numberSplit[0]}
         size={size}
         perspective={perspective}
         numberWrapperStyle={numberWrapperStyle}
@@ -42,8 +47,8 @@ function FlipNumber({
         numberStyle={numberStyle}
       />
       <NumberCard
-        number={numberSplit[1]}
-        previousNumber={previousNumberSplit[1]}
+        number={previousNumberSplit[1]}
+        previousNumber={numberSplit[1]}
         size={size}
         perspective={perspective}
         numberWrapperStyle={numberWrapperStyle}
@@ -61,14 +66,15 @@ FlipNumber.defaultProps = {
 
 FlipNumber.propTypes = {
   number: PropTypes.number.isRequired,
-  flippable: PropTypes.bool,
   unit: PropTypes.oneOf(['hours', 'minutes', 'seconds']),
+  flip: PropTypes.bool,
   size: PropTypes.number,
   perspective: PropTypes.number,
   numberWrapperStyle: PropTypes.object,
   cardStyle: PropTypes.object,
   flipCardStyle: PropTypes.object,
   numberStyle: PropTypes.object,
+  firstRender: PropTypes.bool,
 };
 
 export default FlipNumber;

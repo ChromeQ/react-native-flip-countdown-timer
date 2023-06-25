@@ -22,7 +22,6 @@ class NumberCard extends React.Component {
 
   componentDidMount() {
     const { size } = this.props;
-    this.animateTick();
     this.rotateFront.addListener(({ value }) => {
       this.transformRef(this.frontRef, value, size * 0.3);
     });

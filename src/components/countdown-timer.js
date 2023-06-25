@@ -10,21 +10,22 @@ import TransformUtils from '../utils';
 import style from './style';
 
 class CountdownTimer extends React.Component {
-  state = {
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  };
+  constructor(props) {
+    super(props);
 
-  componentDidMount() {
     const { time } = this.props;
     const { hours, minutes, seconds } = TransformUtils.convertNumberToTime(time);
-    this.setState({
+
+    this.state = {
       hours,
       minutes,
       seconds,
-    });
-    this.timer = setInterval(() => this.updateTime(), 1000);
+    };
+    this.initialTime = true;
+  }
+
+  componentDidMount() {
+    this.timer = setInterval(this.updateTime, 1000);
   }
 
   shouldComponentUpdate(nextProps) {
@@ -44,8 +45,9 @@ class CountdownTimer extends React.Component {
   }
 
   updateTime = () => {
+    this.initialTime = false;
     const { hours, minutes, seconds } = this.state;
-    const { onFinish } = this.props;
+    const { onComplete } = this.props;
     const newState = TransformUtils.subtractTime(hours, minutes, seconds);
     this.setState(prevState => ({ ...prevState, ...newState }));
 
@@ -55,7 +57,8 @@ class CountdownTimer extends React.Component {
       && newState.seconds === 0
     ) {
       clearInterval(this.timer);
-      onFinish();
+      // Delay the `onComplete` callback the animation duration
+      setTimeout(onComplete, 800);
     }
   };
 
@@ -64,7 +67,6 @@ class CountdownTimer extends React.Component {
       wrapperStyle, flipNumberProps, unitsToShow, separators,
     } = this.props;
     const { hours, minutes, seconds } = this.state;
-    console.log('render foo', hours, minutes, seconds);
     const showHours = unitsToShow.includes('H');
     const showMinutes = unitsToShow.includes('M');
     const showSeconds = unitsToShow.includes('S');
@@ -72,32 +74,37 @@ class CountdownTimer extends React.Component {
     return (
       <View style={[style.wrapper, wrapperStyle]}>
         {showHours && (
-          <FlipNumber
-            number={hours}
-            flippable={hours !== 0}
-            unit="hours"
-            {...flipNumberProps}
-          />
+          <>
+            <FlipNumber
+              number={hours}
+              unit="hours"
+              flip={minutes === 59}
+              firstRender={this.initialTime}
+              {...flipNumberProps}
+            />
+            {separators && <Separator />}
+          </>
         )}
-
-        {separators && <Separator />}
 
         {showMinutes && (
-          <FlipNumber
-            number={minutes}
-            flippable={hours !== 0}
-            unit="minutes"
-            {...flipNumberProps}
-          />
+          <>
+            <FlipNumber
+              number={minutes}
+              unit="minutes"
+              flip={seconds === 59}
+              firstRender={this.initialTime}
+              {...flipNumberProps}
+            />
+            {separators && <Separator />}
+          </>
         )}
-
-        {separators && <Separator />}
 
         {showSeconds && (
           <FlipNumber
             number={seconds}
-            flippable={minutes !== 0 || hours !== 0}
             unit="seconds"
+            flip
+            firstRender={this.initialTime}
             {...flipNumberProps}
           />
         )}
@@ -109,7 +116,7 @@ class CountdownTimer extends React.Component {
 CountdownTimer.defaultProps = {
   play: true,
   wrapperStyle: {},
-  onFinish: () => {},
+  onComplete: () => {},
   separators: true,
   unitsToShow: ['H', 'M', 'S'],
 };
@@ -126,7 +133,7 @@ CountdownTimer.propTypes = {
     flipCardStyle: PropTypes.object,
     numberStyle: PropTypes.object,
   }),
-  onFinish: PropTypes.func,
+  onComplete: PropTypes.func,
   separators: PropTypes.bool,
   unitsToShow: PropTypes.arrayOf(PropTypes.string),
 };
