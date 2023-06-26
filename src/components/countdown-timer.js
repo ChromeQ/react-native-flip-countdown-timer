@@ -14,7 +14,7 @@ class CountdownTimer extends React.Component {
     super(props);
 
     const { duration, time } = this.props;
-    const { hours, minutes, seconds } = time
+    const { hours, minutes, seconds } = time !== undefined
       ? TransformUtils.convertDateToTime(time)
       : TransformUtils.convertNumberToTime(duration);
 
@@ -27,36 +27,38 @@ class CountdownTimer extends React.Component {
   }
 
   componentDidMount() {
-    this.timer = setInterval(this.updateTime, 1000);
+    const { hours, minutes, seconds } = this.state;
+    const { play } = this.props;
+
+    if ((hours || minutes || seconds) && play) {
+      this.timer = setInterval(this.updateTime, 1000);
+    }
   }
 
   shouldComponentUpdate(nextProps) {
-    const { play } = this.props;
-    if (nextProps.play !== play) {
-      if (nextProps.play) {
-        this.timer = setInterval(this.updateTime, 1000);
-      } else {
-        clearInterval(this.timer);
-      }
-    }
-    return true;
-  }
+    const { time, duration, play } = this.props;
 
-  componentDidUpdate(prevProps) {
-    const { time, duration } = this.props;
-
-    if (time !== prevProps.time || duration !== prevProps.duration) {
+    if (nextProps.time !== time || nextProps.duration !== duration) {
       clearInterval(this.timer);
 
-      const newState = time !== prevProps.time
-        ? TransformUtils.convertDateToTime(time)
-        : TransformUtils.convertNumberToTime(duration);
+      const newState = nextProps.time !== time
+        ? TransformUtils.convertDateToTime(nextProps.time)
+        : TransformUtils.convertNumberToTime(nextProps.duration);
 
       this.initialTime = true;
-      // eslint-disable-next-line react/no-did-update-set-state
       this.setState(newState);
       this.timer = setInterval(this.updateTime, 1000);
     }
+
+    if (nextProps.play !== play) {
+      clearInterval(this.timer);
+
+      if (nextProps.play) {
+        this.timer = setInterval(this.updateTime, 1000);
+      }
+    }
+
+    return true;
   }
 
   componentWillUnmount() {
