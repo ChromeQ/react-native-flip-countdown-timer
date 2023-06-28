@@ -97,6 +97,7 @@
       ]
     },
     "ignore": [
+      "dist/*.js",
       "**/test/*.js"
     ]
   },
