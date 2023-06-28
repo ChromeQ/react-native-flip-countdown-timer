@@ -6,7 +6,7 @@
   "jsnext:main": "dist/react-native-flip-countdown-timer.esm.js",
   "module": "dist/react-native-flip-countdown-timer.esm.js",
   "scripts": {
-    "prepare": "npm run build",
+    "prepack": "npm run build",
     "prebuild": "rimraf dist",
     "build": "rollup -c",
     "dev": "rollup -c -w",
