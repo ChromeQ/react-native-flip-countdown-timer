@@ -2,7 +2,7 @@
 /**
  * https://github.com/facebook/react-native/blob/master/Libraries/Utilities/MatrixMath.js
  * */
-import MatrixMath from 'react-native/Libraries/Utilities/MatrixMath';
+import MatrixMath from './MatrixMath';
 
 const { createIdentityMatrix } = MatrixMath;
 const { multiplyInto } = MatrixMath;
